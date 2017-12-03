@@ -52,6 +52,28 @@ class Matrix {
         }
         return new Matrix(this.rows, other.cols, array);
     }
+    
+    subMatrixWithoutRowCol(remove_row : number, remove_col : number) : Matrix {
+    		let sub_array = [];
+        let new_rows = this.rows;
+        let new_cols = this.cols;
+        let row : number;
+        for (row = 0; row < this.rows; row++){
+        		if (row == remove_row) {
+            		new_rows -= 1;
+            		continue;
+            }
+            let col : number;
+            for (col = 0; col < this.cols; col++){
+            		if (col == remove_col) {continue;}
+                sub_array.push(this.array[row * this.cols + col]);
+            }
+        }
+        if ((remove_col < this.cols) && (remove_col > -1)) {
+        		new_cols -= 1;
+        }
+        return new Matrix(new_rows, new_cols, sub_array);
+    }
 
     det(): number {
         if (this.cols != this.rows) {
@@ -89,9 +111,9 @@ class Matrix {
 
         if (this.cols == 2) {
             let det = this.det();
-            if (Math.abs(det) < 0.0001) {
-                return new Matrix(2, 2, [this.array[3], -this.array[1],
-                                         -this.array[2], this.array[0]]);
+            if (Math.abs(det) > 0.0001) {
+                return new Matrix(2, 2, [this.array[3] / det, -this.array[1] / det,
+                                         -this.array[2] / det, this.array[0] / det]);
             }
             else {
                 return null;
