@@ -31,6 +31,10 @@ class Matrix {
     set(row: number, col: number, value :number){
         this.array[row * this.cols + col] = value
     }
+    
+    scale(factor : number) {
+    		return new Matrix(this.rows, this.cols, this.array.map((x) => {return x * factor;}));
+    }
 
     mult(other: Matrix): Matrix {
         if (this.cols != other.rows) {
@@ -79,6 +83,10 @@ class Matrix {
         if (this.cols != this.rows) {
             return 0;
         }
+        
+        if (this.cols == 1) {
+            return this.array[0];
+        }
 
         if (this.cols == 2) {
             return this.array[0] * this.array[3] - this.array[2] * this.array[1];
@@ -87,12 +95,32 @@ class Matrix {
         if (this.cols == 3) {
             return this.array[0] * (this.array[4] * this.array[8] - this.array[5] * this.array[7]) -
                 this.array[1] * (this.array[3] * this.array[8] - this.array[5] * this.array[6]) +
-                this.array[2] * (this.array[7] * this.array[0] - this.array[4] * this.array[6])
+                this.array[2] * (this.array[7] * this.array[3] - this.array[4] * this.array[6]);
         }
+        
+        let col : number;
+        let result = 0;
+        for(col = 0; col < this.cols; col++){
+        		let sub_det = (this.subMatrixWithoutRowCol(0, col)).det()
+            result += this.get(0, col) * sub_det;
+        }
+        return result;
+    }
+    
+    cofactorMatrix() : Matrix {
+    		let matrix = new Matrix(this.cols, this.rows, Object.assign([], this.array));
+        let row : number;
+        for (row = 0; row < this.rows; row++) {
+            let col: number;
+            for (col = 0; col < this.cols; col++) {
+                matrix.set(row, col, ((-1) ** (col + row)) * (this.subMatrixWithoutRowCol(row, col)).det())
+            }
+        }
+        
+        return matrix;
     }
 
     transpose(): Matrix {
-        
         let matrix = new Matrix(this.cols, this.rows, Object.assign([], this.array));
         let row : number;
         for (row = 0; row < this.rows; row++) {
@@ -109,15 +137,18 @@ class Matrix {
             return null;
         }
 
-        if (this.cols == 2) {
-            let det = this.det();
-            if (Math.abs(det) > 0.0001) {
+        let det = this.det();
+        if (Math.abs(det) > 0.0001) {
+            if (this.cols == 2) {
                 return new Matrix(2, 2, [this.array[3] / det, -this.array[1] / det,
                                          -this.array[2] / det, this.array[0] / det]);
             }
             else {
-                return null;
+                return ((this.cofactorMatrix()).transpose()).scale(1.0 / det);
             }
+        }
+        else {
+            return null;
         }
 
         
