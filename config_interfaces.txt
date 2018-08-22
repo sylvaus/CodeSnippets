@@ -1,0 +1,51 @@
+How to configure /etc/network/interfaces (taken from https://www.raspberrypi.org/forums/viewtopic.php?t=7592)
+
+command: sudo nano /etc/network/interfaces
+
+####################
+#; start of wireless bits
+#; this command stays for all configs
+auto wlan0
+###################
+#; comments indicated by #;
+#; commands indicated by #
+#; remove the # to enable the command
+####################
+#; if using static IP then....#
+#iface wlan0 inet static
+# address UR_IP
+#gateway UR_ROUTER_IP
+#netmask 255.255.255.0
+##################
+#; otherwise use dhcp #
+#iface wlan0 inet dhcp
+###################
+#; OPEN wireless config #
+#wireless-essid UR_ESSID
+#wireless-mode managed
+
+###################
+#; WEP wireless config #
+#wireless-essid UR_ESSID
+#wireless-key UR_KEY
+#; end of WEP config
+
+########################
+#; WPA and WPA2 wireless config #
+#; all command config lines above HERE to be #'ed except the entry auto wlan0
+########################
+wpa-driver wext
+wpa-ssid UR_ESSID
+#; wpa-ap-scan is 1 for visible and 2 for hidden hubs
+wpa-ap-scan 1
+#; wpa-proto is WPA for WPA1 (aka WPA) or RSN for WPA2
+wpa-proto WPA
+#; wpa-pairwise and wpa-group is TKIP for WPA1 or CCMP for WPA2
+wpa-pairwise TKIP
+wpa-group TKIP
+wpa-key-mgmt WPA-PSK
+#; use "wpa_passphrase UR_ESSID UR_KEY" to generate UR_HEX_KEY
+#; enter the result below
+wpa-psk UR_HEX_KEY
+##########################
+# end of wireless bits
